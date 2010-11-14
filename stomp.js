@@ -1,5 +1,5 @@
 var sys = require("sys");
-var tcp = require("tcp");
+var tcp = require("net");
 
 function Connection(host, port, login, password){
   sys.puts("host " + host + " port " + port);
