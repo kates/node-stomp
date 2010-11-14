@@ -50,7 +50,7 @@ function Connection(host, port, login, password){
   
   this.conn = conn;
   this.processCommands();
-  //this.processMessages();
+  this.processMessages();
 }
 
 Connection.prototype.transmit = function(msg){
