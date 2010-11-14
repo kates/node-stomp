@@ -53,8 +53,16 @@ function Connection(host, port, login, password){
   this.processMessages();
 }
 
-Connection.prototype.transmit = function(msg){
-  this.conn.write(msg);
+Connection.prototype.transmit = function(msg, callback){
+	if (this.conn.write(msg)) {
+		if (typeof callback == 'function') callback(msg);
+	} else {
+		if (typeof callback == 'function') {
+			this.conn.on('drain', function() {
+				callback(msg);
+			});
+		}
+	}
 };
 
 Connection.prototype.prepareMessage = function(msg){
@@ -71,7 +79,7 @@ Connection.prototype.processCommands = function(){
   if(this.conn.readyState == "open"){
     var m = null;
     while(m = this.commands.shift()){
-      this.transmit(this.prepareMessage(m));
+      this.transmit(this.prepareMessage(m), m.callback);
     }
   }
   
@@ -132,9 +140,9 @@ Connection.prototype.processMessage = function(data){
   }
 };
 
-Connection.prototype.publish = function(destination, data, headers){
+Connection.prototype.publish = function(destination, data, headers, callback){
   headers && (headers["destination"] = destination) || (headers = {"destination": destination});
-  this.commands.push({command: "SEND", headers: headers, data: data});
+  this.commands.push({command: "SEND", headers: headers, data: data, callback: callback});
 };
 
 Connection.prototype.subscribe = function(destination, headers, callback){
@@ -183,8 +191,8 @@ function Client(host, port, login, password){
   this.conn = new Connection(host, port, login, password);
 };
 
-Client.prototype.publish = function(destination, data, headers){
-  this.conn.publish(destination, data, headers);
+Client.prototype.publish = function(destination, data, headers, callback){
+  this.conn.publish(destination, data, headers, callback);
 };
 
 Client.prototype.subscribe = function(destination, headers, callback){
