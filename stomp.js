@@ -88,8 +88,8 @@ Connection.prototype.parseHeader = function(s){
   var headers = {};
   for(var i=0; i<lines.length; i++){
     var header = lines[i].split(":");
-	var headerName = header.shift().trim();
-	headers[headerName] = header.join(':').trim();
+    var headerName = header.shift().trim();
+    headers[headerName] = header.join(':').trim();
   }
   return headers;
 };
