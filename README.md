@@ -24,6 +24,7 @@ A simple STOMP client.
     var client = new stomp.Client("localhost", 61613);
     client.subscribe("/queue/news", {ack: "client"}, function(data){
       sys.puts(data.body);
+      client.ack(data);
     });
     
 
